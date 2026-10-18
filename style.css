@@ -107,6 +107,19 @@ body{font-family:SHS,"PingFang TC","Noto Sans TC","Noto Sans CJK TC","Microsoft 
 .name .tag{margin-left:6px;vertical-align:2px}
 .intro{font-size:12.5px;color:#b8862c;margin-top:4px;line-height:1.5}
 .desc{font-size:13.5px;line-height:1.65;color:#6a4a24;margin-top:3px}
+.candle{display:none;gap:12px;align-items:center;margin:2px 16px 14px;padding:12px 12px 12px 10px;border-radius:14px;
+ background:linear-gradient(180deg,rgba(255,250,236,.9),rgba(255,243,214,.85));border:1px solid #efcf86;box-shadow:0 3px 10px rgba(214,150,30,.12)}
+.candle.on{display:flex}
+#result.on .candle.on{animation:up .6s cubic-bezier(.2,.8,.3,1) .36s both}
+.candle .cd-ic{flex:0 0 70px;display:flex;justify-content:center}
+.candle .cd-fl{transform-origin:20px 22px;animation:flk 2.4s ease-in-out infinite}
+@keyframes flk{0%,100%{transform:scale(1) rotate(0)}30%{transform:scale(.94,1.05) rotate(-2deg)}65%{transform:scale(1.04,.97) rotate(2deg)}}
+.candle .tx{flex:1;min-width:0}
+.candle .desc{overflow-wrap:anywhere}
+.cd-btn{display:inline-block;margin-top:8px;padding:6px 16px;border-radius:16px;font-size:13px;font-weight:700;letter-spacing:1px;color:#b07a1c;text-decoration:none;
+ background:rgba(255,255,255,.8);border:1.5px solid #e2b34d}
+.cd-btn:active{transform:scale(.96)}
+@media (prefers-reduced-motion:reduce){.candle .cd-fl{animation:none}}
 .bottom{padding:4px 0 0}
 .bottom .btn{height:48px;font-size:16px;letter-spacing:1px}
 .bottom .btn+.btn{margin-top:10px}

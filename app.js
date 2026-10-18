@@ -77,6 +77,11 @@ var READINGS = null, BYID = {};
 var readingsP = fetch('readings.json').then(function (r) { return r.json(); }).then(function (d) {
   READINGS = d; d.forEach(function (c) { BYID[c.id] = c; }); return d;
 });
+// 蠟燭推薦：candles.json { candles: { 名稱: { cta, url } }, map: { cardId: { upright, reversed } } }
+// 要加商品連結，只要在 candles.json 填 url，網頁會自動出現「看看這款蠟燭」按鈕。
+var CANDLES = null;
+var candlesP = fetch('candles.json').then(function (r) { return r.json(); }).then(function (d) { CANDLES = d; return d; })
+  .catch(function () { return null; });
 
 /* ================= sparkles ================= */
 (function () {
@@ -339,8 +344,38 @@ function renderResult(rec) {
       '<div class="intro">' + pos.label + '：' + pos.intro + '</div>' +
       '<div class="desc">' + esc(p.rev ? c.reversed : c.upright) + '</div></div></div>';
   }).join('');
+  renderCandle(rec);
   var q = quota(rec, Date.now());
   $('resNote').textContent = TEST_MODE ? '測試模式：不限次數' : '下次免費抽牌：' + md(q.nextReset) + '（一）00:00 起';
+}
+/* 依「未來」(第三張) 牌的正逆位推薦一款蠟燭 */
+var candleSeq = 0;
+function renderCandle(rec) {
+  var box = $('candle'), seq = ++candleSeq;
+  box.innerHTML = ''; box.classList.remove('on');
+  var f = rec.cards && rec.cards[2];
+  if (!f) return;
+  candlesP.then(function (d) {
+    if (seq !== candleSeq || !d || !d.map || !d.candles) return;
+    var m = d.map[f.id], name = m && (f.rev ? m.reversed : m.upright), c = name && d.candles[name];
+    if (!c) return;
+    var url = (c.url || '').trim(), safe = /^https?:\/\//i.test(url);
+    box.innerHTML =
+      '<div class="cd-ic" aria-hidden="true"><svg viewBox="0 0 40 64" width="34" height="54">' +
+        '<defs><linearGradient id="cdF" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe9a8"/><stop offset=".55" stop-color="#f4b23c"/><stop offset="1" stop-color="#e07a1c"/></linearGradient>' +
+        '<linearGradient id="cdB" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#f6dfa6"/><stop offset=".5" stop-color="#fff6de"/><stop offset="1" stop-color="#e9c77a"/></linearGradient></defs>' +
+        '<ellipse cx="20" cy="15" rx="11" ry="13" fill="#ffd36b" opacity=".25"/>' +
+        '<path class="cd-fl" d="M20 4C23 10 26 13 26 18a6 6 0 0 1-12 0c0-5 3-8 6-14z" fill="url(#cdF)"/>' +
+        '<rect x="19.2" y="21" width="1.6" height="5" rx=".8" fill="#6a4a24"/>' +
+        '<rect x="9" y="26" width="22" height="34" rx="3" fill="url(#cdB)" stroke="#e2b34d" stroke-width="1.2"/>' +
+        '<path d="M9 30q5 3 11 0t11 0" fill="none" stroke="#e2b34d" stroke-width="1"/></svg></div>' +
+      '<div class="tx"><div class="pos">✦ 為未來點一盞燭光</div>' +
+      '<div class="name">「' + esc(name) + '」蠟燭</div>' +
+      '<div class="desc">' + esc(c.cta) + '</div>' +
+      (safe ? '<a class="cd-btn" href="' + esc(url) + '" target="_blank" rel="noopener">看看這款蠟燭</a>' : '') +
+      '</div>';
+    box.classList.add('on');
+  });
 }
 $('btnDeep').addEventListener('click', function () {
   if (CONFIG.DEEP_READING_URL) location.href = CONFIG.DEEP_READING_URL;
@@ -357,5 +392,5 @@ readingsP.then(function () {
 renderHome();
 
 // expose for automated preview/testing
-window.__mbee = { pickVisible: function (k) { var c = els.filter(function (e) { return !e.classList.contains('gone'); }); var mid = c.filter(function (e) { return Math.abs(((arcA(+e.dataset.j) + theta) % 360 + 540) % 360 - 180) < 25; }); pick(mid[Math.min(k, mid.length - 1)]); }, rotate: function (d) { theta += d; setWheel(); }, phase: function () { return phase; } };
+window.__mbee = { pickVisible: function (k) { var c = els.filter(function (e) { return !e.classList.contains('gone'); }); var mid = c.filter(function (e) { return Math.abs(((arcA(+e.dataset.j) + theta) % 360 + 540) % 360 - 180) < 25; }); pick(mid[Math.min(k, mid.length - 1)]); }, rotate: function (d) { theta += d; setWheel(); }, phase: function () { return phase; }, candle: function () { var b = $('candle'); return b.classList.contains('on') ? b.querySelector('.name').textContent : ''; } };
 })();

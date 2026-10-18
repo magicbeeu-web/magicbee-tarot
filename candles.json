@@ -1,0 +1,346 @@
+{
+  "candles": {
+    "火熱撩慾": {
+      "cta": "想讓這份心動再升溫、更進一步，可以點一盞火熱撩慾蠟燭，陪你把心裡的熱度好好傳遞出去。",
+      "url": ""
+    },
+    "戀情長久": {
+      "cta": "想讓這份溫暖的感情穩穩地走下去，可以點一盞戀情長久蠟燭，替你們守護長長久久的心意。",
+      "url": ""
+    },
+    "幸運隨行": {
+      "cta": "想讓這股好運來得更快，可以點一盞幸運隨行蠟燭，讓好運一路陪在你身邊。",
+      "url": ""
+    },
+    "清心解惡": {
+      "cta": "想讓心裡繁雜的思緒和不好的能量早點散去，可以點一盞清心解惡蠟燭，讓內心重新安定下來。",
+      "url": ""
+    },
+    "財運豐收": {
+      "cta": "想讓這股財運來得更快，可以點一盞財運豐收蠟燭，陪你把努力換來的豐盛好好收進來。",
+      "url": ""
+    },
+    "貴人常駐": {
+      "cta": "想讓願意幫你的人更快出現在身邊，可以點一盞貴人常駐蠟燭，讓貴人陪著你往前走。",
+      "url": ""
+    },
+    "願力加速": {
+      "cta": "想讓心裡的願望更快實現，可以點一盞願力加速蠟燭，替你許下的心願添一份力量。",
+      "url": ""
+    }
+  },
+  "map": {
+    "the-fool": {
+      "upright": "幸運隨行",
+      "reversed": "願力加速"
+    },
+    "the-magician": {
+      "upright": "願力加速",
+      "reversed": "願力加速"
+    },
+    "the-high-priestess": {
+      "upright": "清心解惡",
+      "reversed": "清心解惡"
+    },
+    "the-empress": {
+      "upright": "財運豐收",
+      "reversed": "財運豐收"
+    },
+    "the-emperor": {
+      "upright": "貴人常駐",
+      "reversed": "貴人常駐"
+    },
+    "the-hierophant": {
+      "upright": "貴人常駐",
+      "reversed": "願力加速"
+    },
+    "the-lovers": {
+      "upright": "火熱撩慾",
+      "reversed": "戀情長久"
+    },
+    "the-chariot": {
+      "upright": "幸運隨行",
+      "reversed": "願力加速"
+    },
+    "strength": {
+      "upright": "清心解惡",
+      "reversed": "願力加速"
+    },
+    "the-hermit": {
+      "upright": "清心解惡",
+      "reversed": "貴人常駐"
+    },
+    "wheel-of-fortune": {
+      "upright": "幸運隨行",
+      "reversed": "幸運隨行"
+    },
+    "justice": {
+      "upright": "財運豐收",
+      "reversed": "清心解惡"
+    },
+    "the-hanged-man": {
+      "upright": "幸運隨行",
+      "reversed": "願力加速"
+    },
+    "death": {
+      "upright": "清心解惡",
+      "reversed": "清心解惡"
+    },
+    "temperance": {
+      "upright": "幸運隨行",
+      "reversed": "清心解惡"
+    },
+    "the-devil": {
+      "upright": "火熱撩慾",
+      "reversed": "清心解惡"
+    },
+    "the-tower": {
+      "upright": "清心解惡",
+      "reversed": "清心解惡"
+    },
+    "the-star": {
+      "upright": "願力加速",
+      "reversed": "願力加速"
+    },
+    "the-moon": {
+      "upright": "清心解惡",
+      "reversed": "清心解惡"
+    },
+    "the-sun": {
+      "upright": "幸運隨行",
+      "reversed": "幸運隨行"
+    },
+    "judgement": {
+      "upright": "願力加速",
+      "reversed": "清心解惡"
+    },
+    "the-world": {
+      "upright": "願力加速",
+      "reversed": "願力加速"
+    },
+    "ace-of-wands": {
+      "upright": "幸運隨行",
+      "reversed": "願力加速"
+    },
+    "two-of-wands": {
+      "upright": "願力加速",
+      "reversed": "幸運隨行"
+    },
+    "three-of-wands": {
+      "upright": "幸運隨行",
+      "reversed": "幸運隨行"
+    },
+    "four-of-wands": {
+      "upright": "幸運隨行",
+      "reversed": "貴人常駐"
+    },
+    "five-of-wands": {
+      "upright": "幸運隨行",
+      "reversed": "清心解惡"
+    },
+    "six-of-wands": {
+      "upright": "幸運隨行",
+      "reversed": "清心解惡"
+    },
+    "seven-of-wands": {
+      "upright": "清心解惡",
+      "reversed": "清心解惡"
+    },
+    "eight-of-wands": {
+      "upright": "幸運隨行",
+      "reversed": "幸運隨行"
+    },
+    "nine-of-wands": {
+      "upright": "幸運隨行",
+      "reversed": "貴人常駐"
+    },
+    "ten-of-wands": {
+      "upright": "願力加速",
+      "reversed": "貴人常駐"
+    },
+    "page-of-wands": {
+      "upright": "幸運隨行",
+      "reversed": "願力加速"
+    },
+    "knight-of-wands": {
+      "upright": "幸運隨行",
+      "reversed": "清心解惡"
+    },
+    "queen-of-wands": {
+      "upright": "貴人常駐",
+      "reversed": "願力加速"
+    },
+    "king-of-wands": {
+      "upright": "貴人常駐",
+      "reversed": "貴人常駐"
+    },
+    "ace-of-cups": {
+      "upright": "火熱撩慾",
+      "reversed": "戀情長久"
+    },
+    "two-of-cups": {
+      "upright": "戀情長久",
+      "reversed": "戀情長久"
+    },
+    "three-of-cups": {
+      "upright": "貴人常駐",
+      "reversed": "貴人常駐"
+    },
+    "four-of-cups": {
+      "upright": "清心解惡",
+      "reversed": "幸運隨行"
+    },
+    "five-of-cups": {
+      "upright": "清心解惡",
+      "reversed": "幸運隨行"
+    },
+    "six-of-cups": {
+      "upright": "戀情長久",
+      "reversed": "清心解惡"
+    },
+    "seven-of-cups": {
+      "upright": "願力加速",
+      "reversed": "清心解惡"
+    },
+    "eight-of-cups": {
+      "upright": "願力加速",
+      "reversed": "清心解惡"
+    },
+    "nine-of-cups": {
+      "upright": "願力加速",
+      "reversed": "願力加速"
+    },
+    "ten-of-cups": {
+      "upright": "戀情長久",
+      "reversed": "戀情長久"
+    },
+    "page-of-cups": {
+      "upright": "火熱撩慾",
+      "reversed": "清心解惡"
+    },
+    "knight-of-cups": {
+      "upright": "火熱撩慾",
+      "reversed": "戀情長久"
+    },
+    "queen-of-cups": {
+      "upright": "戀情長久",
+      "reversed": "清心解惡"
+    },
+    "king-of-cups": {
+      "upright": "貴人常駐",
+      "reversed": "清心解惡"
+    },
+    "ace-of-swords": {
+      "upright": "清心解惡",
+      "reversed": "清心解惡"
+    },
+    "two-of-swords": {
+      "upright": "清心解惡",
+      "reversed": "清心解惡"
+    },
+    "three-of-swords": {
+      "upright": "清心解惡",
+      "reversed": "戀情長久"
+    },
+    "four-of-swords": {
+      "upright": "清心解惡",
+      "reversed": "幸運隨行"
+    },
+    "five-of-swords": {
+      "upright": "清心解惡",
+      "reversed": "幸運隨行"
+    },
+    "six-of-swords": {
+      "upright": "清心解惡",
+      "reversed": "貴人常駐"
+    },
+    "seven-of-swords": {
+      "upright": "清心解惡",
+      "reversed": "清心解惡"
+    },
+    "eight-of-swords": {
+      "upright": "清心解惡",
+      "reversed": "清心解惡"
+    },
+    "nine-of-swords": {
+      "upright": "清心解惡",
+      "reversed": "清心解惡"
+    },
+    "ten-of-swords": {
+      "upright": "清心解惡",
+      "reversed": "幸運隨行"
+    },
+    "page-of-swords": {
+      "upright": "貴人常駐",
+      "reversed": "清心解惡"
+    },
+    "knight-of-swords": {
+      "upright": "願力加速",
+      "reversed": "清心解惡"
+    },
+    "queen-of-swords": {
+      "upright": "清心解惡",
+      "reversed": "貴人常駐"
+    },
+    "king-of-swords": {
+      "upright": "貴人常駐",
+      "reversed": "清心解惡"
+    },
+    "ace-of-pentacles": {
+      "upright": "貴人常駐",
+      "reversed": "財運豐收"
+    },
+    "two-of-pentacles": {
+      "upright": "財運豐收",
+      "reversed": "幸運隨行"
+    },
+    "three-of-pentacles": {
+      "upright": "貴人常駐",
+      "reversed": "貴人常駐"
+    },
+    "four-of-pentacles": {
+      "upright": "財運豐收",
+      "reversed": "財運豐收"
+    },
+    "five-of-pentacles": {
+      "upright": "貴人常駐",
+      "reversed": "財運豐收"
+    },
+    "six-of-pentacles": {
+      "upright": "貴人常駐",
+      "reversed": "清心解惡"
+    },
+    "seven-of-pentacles": {
+      "upright": "財運豐收",
+      "reversed": "願力加速"
+    },
+    "eight-of-pentacles": {
+      "upright": "貴人常駐",
+      "reversed": "貴人常駐"
+    },
+    "nine-of-pentacles": {
+      "upright": "財運豐收",
+      "reversed": "財運豐收"
+    },
+    "ten-of-pentacles": {
+      "upright": "財運豐收",
+      "reversed": "財運豐收"
+    },
+    "page-of-pentacles": {
+      "upright": "財運豐收",
+      "reversed": "願力加速"
+    },
+    "knight-of-pentacles": {
+      "upright": "財運豐收",
+      "reversed": "幸運隨行"
+    },
+    "queen-of-pentacles": {
+      "upright": "貴人常駐",
+      "reversed": "財運豐收"
+    },
+    "king-of-pentacles": {
+      "upright": "貴人常駐",
+      "reversed": "財運豐收"
+    }
+  }
+}
