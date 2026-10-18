@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#fff3dc">
+<title>魔法蜜蜂・本週免費抽牌</title>
+<link rel="preload" href="shs-bold.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="back.webp" as="image">
+<link rel="icon" href="bee.webp">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+ <div class="sparkles" id="sparkles" aria-hidden="true"></div>
+
+ <!-- 1 首頁 -->
+ <section class="screen" id="home">
+  <div class="home-in">
+   <img class="logo" src="bee.webp" alt=""><img class="wm" src="wordmark.webp" alt="Magic Bee">
+   <h1 class="h1 gold">本週免費抽牌</h1>
+   <p class="lead">心裡默想一個問題，<br>憑直覺選三張牌</p>
+   <div class="hero"><div class="glow"></div>
+    <div class="hc hc1"></div><div class="hc hc2"></div><div class="hc hc3"></div>
+   </div>
+   <div class="badge" id="badge">✦ 本週剩 <b id="left">1</b> 次 ✦</div>
+   <button class="btn" id="btnStart">開始抽牌</button>
+   <p class="note" id="note">每週一 00:00 重置免費次數</p>
+  </div>
+ </section>
+
+ <!-- 2 洗牌 + 選牌 (同一張桌面) -->
+ <section class="screen" id="table">
+  <div class="tbl-top">
+   <div class="prompt" id="prompt">心裡默念你的問題…</div>
+   <div class="pick-head" id="pickHead">
+    <h2 class="h2 gold" id="pickTitle">想著你的問題，選三張牌</h2>
+    <div class="count" id="count">已選 <span id="nSel">0</span>/3</div>
+   </div>
+   <div class="slots" id="slots">
+    <div class="slotw"><div class="slot" data-i="0"><i>✦</i></div><div class="sl">現況</div><div class="st"></div></div>
+    <div class="slotw"><div class="slot" data-i="1"><i>✦</i></div><div class="sl">阻礙</div><div class="st"></div></div>
+    <div class="slotw"><div class="slot" data-i="2"><i>✦</i></div><div class="sl">好事</div><div class="st"></div></div>
+   </div>
+  </div>
+  <div class="deck" id="deck"><div class="wheel" id="wheel"></div></div>
+  <div class="hint" id="hint"><b id="hintMain">憑直覺選一張牌</b><br><i>←</i> 左右滑動，78 張牌任你挑 <i>→</i></div>
+  <button class="btn" id="btnShuffled">洗好了</button>
+  <button class="btn" id="btnSee">看我的訊息</button>
+ </section>
+
+ <!-- 3 結果 -->
+ <section class="screen" id="result">
+  <div class="res-in">
+   <div class="top"><h2 class="h2 gold">你的本週訊息</h2><div class="sub" id="resSub">現況・阻礙・好事</div></div>
+   <div class="items" id="items"></div>
+   <div class="bottom">
+    <button class="btn" id="btnDeep">想要更深入的專屬解讀</button>
+    <button class="btn ghost" id="btnNext">下週再來抽</button>
+    <p class="note" id="resNote"></p>
+   </div>
+  </div>
+ </section>
+
+ <div class="fly" id="fly"></div>
+ <div class="toast" id="toast"></div>
+ <div class="testtag" id="testtag">測試模式</div>
+</div>
+<script src="app.js"></script>
+</body></html>
