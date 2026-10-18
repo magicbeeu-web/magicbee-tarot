@@ -19,6 +19,8 @@ var CONFIG = {
 };
 var params = new URLSearchParams(location.search);
 var TEST_MODE = params.get('test') === '1';
+// ?reset=1 clears this device's weekly record (for demos), then drops the param
+if (params.get('reset') === '1') { try { localStorage.removeItem(CONFIG.STORAGE_KEY); localStorage.removeItem(CONFIG.STORAGE_KEY + '_test'); } catch (e) {} params.delete('reset'); try { history.replaceState(null, '', location.pathname + (params.toString() ? '?' + params : '') + location.hash); } catch (e) {} }
 // test only: ?test=1&revs=010 forces upright/reversed per position (for previews)
 var FORCE_REVS = TEST_MODE && /^[01]{3}$/.test(params.get('revs') || '') ? params.get('revs') : null;
 var REDUCED = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
