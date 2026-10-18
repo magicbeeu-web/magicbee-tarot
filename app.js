@@ -10,9 +10,9 @@ var CONFIG = {
   // 之後可填綠界 https://a.ecpay.tw/eFJ7 或 LINE 對話連結 https://line.me/R/oaMessage/@xxxx/?text=...
   DEEP_READING_URL: '',
   POSITIONS: [
-    { key: 'now',   label: '現況', intro: '這張牌說的是你現在的狀態。' },
-    { key: 'block', label: '阻礙', intro: '這張牌點出這週需要多照顧的地方。' },
-    { key: 'good',  label: '好事', intro: '這張牌是正在朝你靠近的好事。' }
+    { key: 'past',  label: '過去', intro: '這張牌說的是一路走來影響你的事。' },
+    { key: 'now',   label: '現在', intro: '這張牌說的是你此刻的狀態。' },
+    { key: 'future', label: '未來', intro: '這張牌說的是接下來朝你靠近的發展。' }
   ],
   TZ_OFFSET_H: 8,                // Asia/Taipei (no DST)
   STORAGE_KEY: 'mbee_tarot_v1'
@@ -330,7 +330,7 @@ $('btnSee').addEventListener('click', function () { show('result'); $('result').
 /* ================= RESULT ================= */
 function renderResult(rec) {
   var ws = rec.weekStart;
-  $('resSub').textContent = md(ws) + '（一）– ' + md(ws + 6 * DAY) + '（日）・現況・阻礙・好事';
+  $('resSub').textContent = md(ws) + '（一）– ' + md(ws + 6 * DAY) + '（日）・過去・現在・未來';
   $('items').innerHTML = rec.cards.map(function (p, i) {
     var c = BYID[p.id] || { name_zh: p.id, upright: '', reversed: '' }, pos = CONFIG.POSITIONS[i];
     return '<div class="item"><div class="card' + (p.rev ? ' rev' : '') + '" style="background-image:url(' + img(p.id) + ')"></div><div class="tx">' +
