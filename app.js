@@ -72,6 +72,7 @@ function img(id) { return 'c-' + id + '.webp'; }
 function preload(src) { return new Promise(function (r) { var i = new Image(); i.onload = i.onerror = function () { r(); }; i.src = src; setTimeout(r, 4000); }); }
 function toast(msg) { var t = $('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove('on'); }, 2200); }
 function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+var BGM_SRC = 'bgm.mp3';
 var SFX_SRC = { draw: 'draw.mp3', flip: 'flip.mp3' };
 
 /* ================= 音效 sound effects (draw = pick a card, flip = card flips in reveal) =================
@@ -114,11 +115,113 @@ var SFX = (function () {
       if (els[k]) { var a = els[k].cloneNode(); a.volume = VOL; var p = a.play(); if (p && p.catch) p.catch(function () {}); }
     } catch (e) {}
   }
-  return { draw: function () { play('draw'); }, flip: function () { play('flip'); } };
+  return { draw: function () { play('draw'); }, flip: function () { play('flip'); }, ctx: ctx };
 })();
 
 var app = $('app');
 if (TEST_MODE) app.classList.add('test');
+
+/* ================= 背景音樂 BGM (Amber 10/19) =================
+ * Silent on the home screen. Starts on the 開始抽牌 tap (= entering the shuffle), 2 s fade-in,
+ * seamless loop, eases down a little on the result page, fades out when going back home.
+ * bgm.mp3 = 48 s loop + 1.5 s periodic tail; looping between loopStart and loopStart+LOOP_LEN
+ * keeps any mp3 encoder delay/padding out of the loop, so there is no gap.
+ * Web Audio (shares the SFX context, so the existing unlock applies); <audio> is used only
+ * when Web Audio doesn't exist. Mute state: localStorage 'mbee_bgm_muted'. Any failure is silent. */
+var BGM = (function () {
+  var VOL = 0.2, LOOP_START = 0.5, LOOP_LEN = 48, FADE_IN = 2, KEY = 'mbee_bgm_muted';
+  var ctx = SFX.ctx, g = null, buf = null, src = null, el = null, want = false, level = 1, loading = false, failed = false, fadeT = 0;
+  var muted = false; try { muted = localStorage.getItem(KEY) === '1'; } catch (e) {}
+  var btn = $('bgmBtn');
+  try { if (ctx) { g = ctx.createGain(); g.gain.value = 0; g.connect(ctx.destination); } } catch (e) { ctx = null; }
+  function target() { return muted ? 0 : VOL * level; }
+  function load() {
+    if (loading) return; loading = true;
+    if (ctx) {
+      try {
+        fetch(BGM_SRC).then(function (r) { return r.arrayBuffer(); }).then(function (ab) {
+          ctx.decodeAudioData(ab, function (b) { buf = b; if (want) startNode(); }, function () { failed = true; });
+        }).catch(function () { failed = true; });
+      } catch (e) { failed = true; }
+    } else {
+      try {
+        el = new Audio(BGM_SRC); el.preload = 'auto'; el.volume = 0;
+        el.addEventListener('timeupdate', function () { if (el.currentTime > LOOP_START + LOOP_LEN) el.currentTime -= LOOP_LEN; });
+        el.addEventListener('ended', function () { if (want) { el.currentTime = LOOP_START; var p = el.play(); if (p && p.catch) p.catch(function () {}); } });
+      } catch (e) { el = null; failed = true; }
+    }
+  }
+  function ramp(to, sec) {
+    try {
+      if (g) {
+        var now = ctx.currentTime, p = g.gain;
+        if (p.cancelScheduledValues) p.cancelScheduledValues(now);
+        p.setValueAtTime(p.value, now); p.linearRampToValueAtTime(to, now + Math.max(0.02, sec));
+      } else if (el) {
+        clearInterval(fadeT); var from = el.volume, t0 = Date.now();
+        fadeT = setInterval(function () {
+          var k = Math.min(1, (Date.now() - t0) / (sec * 1000 || 1));
+          try { el.volume = Math.max(0, Math.min(1, from + (to - from) * k)); } catch (e) {}
+          if (k >= 1) clearInterval(fadeT);
+        }, 50);
+      }
+    } catch (e) {}
+  }
+  function startNode() {
+    if (!want || src || !buf) return;
+    try {
+      if (ctx.state === 'suspended' && ctx.resume) ctx.resume();
+      var s = ctx.createBufferSource(); s.buffer = buf; s.loop = true;
+      var end = Math.min(buf.duration, LOOP_START + LOOP_LEN);
+      s.loopStart = Math.max(0, end - LOOP_LEN); s.loopEnd = end;
+      s.connect(g); g.gain.cancelScheduledValues && g.gain.cancelScheduledValues(ctx.currentTime);
+      g.gain.setValueAtTime(0, ctx.currentTime); s.start(0, s.loopStart);
+      src = s; ramp(target(), FADE_IN);
+    } catch (e) { src = null; }
+  }
+  function paint() {
+    if (!btn) return;
+    btn.classList.toggle('off', muted); btn.setAttribute('aria-pressed', muted ? 'false' : 'true');
+    btn.setAttribute('aria-label', muted ? '開啟背景音樂' : '關閉背景音樂');
+  }
+  function start() {                      // call inside the user's tap
+    if (want) return; want = true; level = 1;
+    app.classList.add('bgm');
+    load();
+    try {
+      if (ctx) { if (ctx.state === 'suspended' && ctx.resume) ctx.resume(); startNode(); }
+      else if (el) { el.volume = 0; try { el.currentTime = LOOP_START; } catch (e) {} var p = el.play(); if (p && p.catch) p.catch(function () {}); ramp(target(), FADE_IN); }
+    } catch (e) {}
+  }
+  function stop(sec) {
+    if (!want) return; want = false; sec = sec == null ? 1.5 : sec;
+    app.classList.remove('bgm');
+    ramp(0, sec);
+    var s = src; src = null;
+    setTimeout(function () { try { if (s) s.stop(); if (el && !want) el.pause(); } catch (e) {} }, sec * 1000 + 80);
+  }
+  function duck(l) { level = l; if (want) ramp(target(), 1.5); }
+  function toggle() {
+    muted = !muted; try { localStorage.setItem(KEY, muted ? '1' : '0'); } catch (e) {}
+    paint(); if (want) ramp(target(), muted ? 0.3 : 0.8);
+  }
+  if (btn) btn.addEventListener('click', function (e) { e.stopPropagation(); toggle(); });
+  // pause the <audio> fallback while the page is hidden; resume the context when back
+  document.addEventListener('visibilitychange', function () {
+    try {
+      if (document.hidden) { if (el) el.pause(); }
+      else if (want) {
+        if (ctx && ctx.state === 'suspended' && ctx.resume) ctx.resume();
+        if (el) { var p = el.play(); if (p && p.catch) p.catch(function () {}); }
+      }
+    } catch (e) {}
+  });
+  paint();
+  // fetch quietly a moment after load so it's ready by the time 開始抽牌 is tapped (nothing plays here)
+  window.addEventListener('load', function () { setTimeout(load, 1200); });
+  return { start: start, stop: stop, duck: duck, toggle: toggle,
+    state: function () { return { want: want, muted: muted, loaded: !!buf || !!el, failed: failed, playing: !!src || !!(el && !el.paused), gain: g ? g.gain.value : (el ? el.volume : 0), ctx: ctx ? ctx.state : 'none' }; } };
+})();
 var READINGS = null, BYID = {};
 var readingsP = fetch('readings.json').then(function (r) { return r.json(); }).then(function (d) {
   READINGS = d; d.forEach(function (c) { BYID[c.id] = c; }); return d;
@@ -168,7 +271,7 @@ function renderHome() {
 }
 $('btnStart').addEventListener('click', function () {
   if (!Q) return;
-  if (Q.remaining > 0) startDraw();
+  if (Q.remaining > 0) { BGM.start(); startDraw(); }   // music begins with the shuffle (inside the tap, for iOS/LINE)
   else if (Q.current && Q.current.cards) { renderResult(Q.current); show('result'); }
 });
 
@@ -378,7 +481,7 @@ function reveal() {
     setTimeout(function () { renderResult(rec); t.classList.add('done'); phase = 'done'; }, REDUCED ? 100 : 3 * 520 + 500);
   });
 }
-$('btnSee').addEventListener('click', function () { show('result'); $('result').querySelector('.res-in').scrollTop = 0; });
+$('btnSee').addEventListener('click', function () { BGM.duck(0.6); show('result'); $('result').querySelector('.res-in').scrollTop = 0; });
 
 /* ================= RESULT ================= */
 function renderResult(rec) {
@@ -429,7 +532,7 @@ $('btnDeep').addEventListener('click', function () {
   if (CONFIG.DEEP_READING_URL) location.href = CONFIG.DEEP_READING_URL;
   else toast('專屬解讀即將開放，敬請期待 ✦');
 });
-$('btnNext').addEventListener('click', function () { renderHome(); });
+$('btnNext').addEventListener('click', function () { BGM.stop(1.5); renderHome(); });   // home stays silent
 
 window.addEventListener('resize', function () { if (phase === 'pick' || phase === 'shuffle') { layout(); if (phase === 'pick') els.forEach(function (e, j) { if (!e.classList.contains('gone')) e.style.transform = arcTf(j); }); } });
 
@@ -440,5 +543,5 @@ readingsP.then(function () {
 renderHome();
 
 // expose for automated preview/testing
-window.__mbee = { pickVisible: function (k) { var c = els.filter(function (e) { return !e.classList.contains('gone'); }); var mid = c.filter(function (e) { return Math.abs(((arcA(+e.dataset.j) + theta) % 360 + 540) % 360 - 180) < 25; }); pick(mid[Math.min(k, mid.length - 1)]); }, rotate: function (d) { theta += d; setWheel(); }, phase: function () { return phase; }, candle: function () { var b = $('candle'); return b.classList.contains('on') ? b.querySelector('.name').textContent : ''; } };
+window.__mbee = { pickVisible: function (k) { var c = els.filter(function (e) { return !e.classList.contains('gone'); }); var mid = c.filter(function (e) { return Math.abs(((arcA(+e.dataset.j) + theta) % 360 + 540) % 360 - 180) < 25; }); pick(mid[Math.min(k, mid.length - 1)]); }, rotate: function (d) { theta += d; setWheel(); }, phase: function () { return phase; }, bgm: function () { return BGM.state(); }, candle: function () { var b = $('candle'); return b.classList.contains('on') ? b.querySelector('.name').textContent : ''; } };
 })();
