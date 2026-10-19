@@ -72,6 +72,48 @@ function img(id) { return 'c-' + id + '.webp'; }
 function preload(src) { return new Promise(function (r) { var i = new Image(); i.onload = i.onerror = function () { r(); }; i.src = src; setTimeout(r, 4000); }); }
 function toast(msg) { var t = $('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove('on'); }, 2200); }
 function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+var FLIP_SRC = 'flip.mp3';
+
+/* ================= 翻牌音效 flip sound =================
+ * Web Audio (decoded once, low latency) with an <audio> fallback.
+ * Unlocked on the first tap (iOS / LINE in-app browser need a gesture). Any failure is silent. */
+var SFX = (function () {
+  var VOL = 0.5, ctx = null, buf = null, gain = null, el = null, unlocked = false;
+  try {
+    var AC = window.AudioContext || window.webkitAudioContext;
+    if (AC) { ctx = new AC(); gain = ctx.createGain(); gain.gain.value = VOL; gain.connect(ctx.destination); }
+  } catch (e) { ctx = null; }
+  if (ctx) {
+    try {
+      fetch(FLIP_SRC).then(function (r) { return r.arrayBuffer(); }).then(function (ab) {
+        ctx.decodeAudioData(ab, function (b) { buf = b; }, function () {});
+      }).catch(function () {});
+    } catch (e) {}
+  }
+  try { el = new Audio(FLIP_SRC); el.preload = 'auto'; el.volume = VOL; } catch (e) { el = null; }
+  function unlock() {
+    if (unlocked) return; unlocked = true;
+    try {
+      if (ctx) {
+        if (ctx.state === 'suspended' && ctx.resume) ctx.resume();
+        var s = ctx.createBufferSource(); s.buffer = ctx.createBuffer(1, 1, 22050); s.connect(ctx.destination); s.start(0);
+      }
+    } catch (e) {}
+    ['pointerdown', 'touchend', 'click'].forEach(function (ev) { window.removeEventListener(ev, unlock, true); });
+  }
+  ['pointerdown', 'touchend', 'click'].forEach(function (ev) { window.addEventListener(ev, unlock, true); });
+  return {
+    flip: function () {
+      try {
+        if (ctx && buf && ctx.state !== 'closed') {
+          if (ctx.state === 'suspended' && ctx.resume) ctx.resume();
+          var s = ctx.createBufferSource(); s.buffer = buf; s.connect(gain); s.start(0); return;
+        }
+        if (el) { var a = el.cloneNode(); a.volume = VOL; var p = a.play(); if (p && p.catch) p.catch(function () {}); }
+      } catch (e) {}
+    }
+  };
+})();
 
 var app = $('app');
 if (TEST_MODE) app.classList.add('test');
@@ -325,6 +367,7 @@ function reveal() {
     picks.forEach(function (p, i) {
       setTimeout(function () {
         flips[i].classList.add('on');
+        if (!REDUCED || i === 0) SFX.flip();   // one flip sound per card, staggered with the flip animation
         sts[i].innerHTML = p.rev ? '<span class="tag">逆位</span>' : '<span class="tag up">正位</span>';
         sts[i].classList.add('on');
       }, REDUCED ? 0 : i * 520);
