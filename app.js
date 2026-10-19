@@ -72,25 +72,28 @@ function img(id) { return 'c-' + id + '.webp'; }
 function preload(src) { return new Promise(function (r) { var i = new Image(); i.onload = i.onerror = function () { r(); }; i.src = src; setTimeout(r, 4000); }); }
 function toast(msg) { var t = $('toast'); t.textContent = msg; t.classList.add('on'); clearTimeout(toast._t); toast._t = setTimeout(function () { t.classList.remove('on'); }, 2200); }
 function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
-var FLIP_SRC = 'flip.mp3';
+var SFX_SRC = { draw: 'draw.mp3', flip: 'flip.mp3' };
 
-/* ================= 翻牌音效 flip sound =================
- * Web Audio (decoded once, low latency) with an <audio> fallback.
+/* ================= 音效 sound effects (draw = pick a card, flip = card flips in reveal) =================
+ * Web Audio (each file decoded once, low latency) with an <audio> fallback.
  * Unlocked on the first tap (iOS / LINE in-app browser need a gesture). Any failure is silent. */
 var SFX = (function () {
-  var VOL = 0.5, ctx = null, buf = null, gain = null, el = null, unlocked = false;
+  var VOL = 0.5, ctx = null, gain = null, bufs = {}, els = {}, unlocked = false;
   try {
     var AC = window.AudioContext || window.webkitAudioContext;
     if (AC) { ctx = new AC(); gain = ctx.createGain(); gain.gain.value = VOL; gain.connect(ctx.destination); }
   } catch (e) { ctx = null; }
-  if (ctx) {
-    try {
-      fetch(FLIP_SRC).then(function (r) { return r.arrayBuffer(); }).then(function (ab) {
-        ctx.decodeAudioData(ab, function (b) { buf = b; }, function () {});
-      }).catch(function () {});
-    } catch (e) {}
-  }
-  try { el = new Audio(FLIP_SRC); el.preload = 'auto'; el.volume = VOL; } catch (e) { el = null; }
+  Object.keys(SFX_SRC).forEach(function (k) {
+    var src = SFX_SRC[k];
+    if (ctx) {
+      try {
+        fetch(src).then(function (r) { return r.arrayBuffer(); }).then(function (ab) {
+          ctx.decodeAudioData(ab, function (b) { bufs[k] = b; }, function () {});
+        }).catch(function () {});
+      } catch (e) {}
+    }
+    try { var el = new Audio(src); el.preload = 'auto'; el.volume = VOL; els[k] = el; } catch (e) {}
+  });
   function unlock() {
     if (unlocked) return; unlocked = true;
     try {
@@ -102,17 +105,16 @@ var SFX = (function () {
     ['pointerdown', 'touchend', 'click'].forEach(function (ev) { window.removeEventListener(ev, unlock, true); });
   }
   ['pointerdown', 'touchend', 'click'].forEach(function (ev) { window.addEventListener(ev, unlock, true); });
-  return {
-    flip: function () {
-      try {
-        if (ctx && buf && ctx.state !== 'closed') {
-          if (ctx.state === 'suspended' && ctx.resume) ctx.resume();
-          var s = ctx.createBufferSource(); s.buffer = buf; s.connect(gain); s.start(0); return;
-        }
-        if (el) { var a = el.cloneNode(); a.volume = VOL; var p = a.play(); if (p && p.catch) p.catch(function () {}); }
-      } catch (e) {}
-    }
-  };
+  function play(k) {
+    try {
+      if (ctx && bufs[k] && ctx.state !== 'closed') {
+        if (ctx.state === 'suspended' && ctx.resume) ctx.resume();
+        var s = ctx.createBufferSource(); s.buffer = bufs[k]; s.connect(gain); s.start(0); return;
+      }
+      if (els[k]) { var a = els[k].cloneNode(); a.volume = VOL; var p = a.play(); if (p && p.catch) p.catch(function () {}); }
+    } catch (e) {}
+  }
+  return { draw: function () { play('draw'); }, flip: function () { play('flip'); } };
 })();
 
 var app = $('app');
@@ -335,6 +337,7 @@ function pick(el) {
     el.classList.add('gone');
     fc.getBoundingClientRect();              // reflow
     fc.style.transform = 'none';
+    SFX.draw();                              // card pulled from the fan, flying to its slot
     setTimeout(function () {
       fl.remove(); slot.appendChild(fl); slot.classList.add('filled'); fc.remove();
       if (picks.length === 3 && slotI === 2) reveal();
