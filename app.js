@@ -223,13 +223,13 @@ var BGM = (function () {
     state: function () { return { want: want, muted: muted, loaded: !!buf || !!el, failed: failed, playing: !!src || !!(el && !el.paused), gain: g ? g.gain.value : (el ? el.volume : 0), ctx: ctx ? ctx.state : 'none' }; } };
 })();
 var READINGS = null, BYID = {};
-var readingsP = fetch('readings.json').then(function (r) { return r.json(); }).then(function (d) {
+var readingsP = fetch('readings.json?v=20261026b').then(function (r) { return r.json(); }).then(function (d) {
   READINGS = d; d.forEach(function (c) { BYID[c.id] = c; }); return d;
 });
 // 蠟燭推薦：candles.json { candles: { 名稱: { cta, url } }, map: { cardId: { upright, reversed } } }
 // 要加商品連結，只要在 candles.json 填 url，網頁會自動出現「看看這款蠟燭」按鈕。
 var CANDLES = null;
-var candlesP = fetch('candles.json').then(function (r) { return r.json(); }).then(function (d) { CANDLES = d; return d; })
+var candlesP = fetch('candles.json?v=20261026b').then(function (r) { return r.json(); }).then(function (d) { CANDLES = d; return d; })
   .catch(function () { return null; });
 
 /* ================= sparkles ================= */
