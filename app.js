@@ -8,7 +8,7 @@ var CONFIG = {
   REVERSED_RATE: 0.3,            // 逆位機率
   // 「想要更深入的專屬解讀」連結。空字串＝顯示「即將開放」提示。
   // 之後可填綠界 https://a.ecpay.tw/eFJ7 或 LINE 對話連結 https://line.me/R/oaMessage/@xxxx/?text=...
-  DEEP_READING_URL: 'https://line.me/R/oaMessage/@041giocs/?text=%E6%88%91%E6%83%B3%E9%A0%90%E7%B4%84%E5%B0%88%E5%B1%AC%E8%A7%A3%E8%AE%80',
+  DEEP_READING_URL: 'https://line.me/R/oaMessage/@041giocs/?%E6%88%91%E6%83%B3%E9%A0%90%E7%B4%84%E5%B0%88%E5%B1%AC%E8%A7%A3%E8%AE%80',
   POSITIONS: [
     { key: 'past',  label: '起因', intro: '這張牌說的是讓事情走到今天的原因。' },
     { key: 'now',   label: '現在', intro: '這張牌說的是你此刻的狀態。' },
