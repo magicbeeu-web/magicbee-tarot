@@ -23,6 +23,23 @@ var TEST_MODE = params.get('test') === '1';
 if (params.get('reset') === '1') { try { localStorage.removeItem(CONFIG.STORAGE_KEY); localStorage.removeItem(CONFIG.STORAGE_KEY + '_test'); } catch (e) {} params.delete('reset'); try { history.replaceState(null, '', location.pathname + (params.toString() ? '?' + params : '') + location.hash); } catch (e) {} }
 // test only: ?test=1&revs=010 forces upright/reversed per position (for previews)
 var FORCE_REVS = TEST_MODE && /^[01]{3}$/.test(params.get('revs') || '') ? params.get('revs') : null;
+/* ================= 統計 GoatCounter events (skipped for ?test=1 / ?reset=1) ================= */
+var NO_COUNT = !!window.__mbeeNoCount || TEST_MODE;
+var gcQueue = [], gcPoll = null;
+function gcSend(v) { try { window.goatcounter.count(v); } catch (e) {} }
+function track(path, title) {
+  if (NO_COUNT) return;
+  var v = { path: path, title: title || path, event: true };
+  try {
+    if (window.goatcounter && typeof window.goatcounter.count === 'function') { gcSend(v); return; }
+    // script not loaded yet (or blocked): queue briefly, give up after ~15s
+    gcQueue.push(v);
+    if (!gcPoll) { var tries = 0; gcPoll = setInterval(function () {
+      if (window.goatcounter && typeof window.goatcounter.count === 'function') { while (gcQueue.length) gcSend(gcQueue.shift()); }
+      if (!gcQueue.length || ++tries > 30) { clearInterval(gcPoll); gcPoll = null; gcQueue = []; }
+    }, 500); }
+  } catch (e) {}
+}
 var REDUCED = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 /* ================= 週期 Week helpers (Monday 00:00 Asia/Taipei) ================= */
@@ -271,8 +288,8 @@ function renderHome() {
 }
 $('btnStart').addEventListener('click', function () {
   if (!Q) return;
-  if (Q.remaining > 0) { BGM.start(); startDraw(); }   // music begins with the shuffle (inside the tap, for iOS/LINE)
-  else if (Q.current && Q.current.cards) { renderResult(Q.current); show('result'); }
+  if (Q.remaining > 0) { track('start', '開始抽牌'); BGM.start(); startDraw(); }   // music begins with the shuffle (inside the tap, for iOS/LINE)
+  else if (Q.current && Q.current.cards) { track('repeat-view', '本週已抽過・看我這週的牌'); renderResult(Q.current); show('result'); }
 });
 
 /* ================= TABLE: layout ================= */
@@ -478,7 +495,7 @@ function reveal() {
         sts[i].classList.add('on');
       }, REDUCED ? 0 : i * 520);
     });
-    setTimeout(function () { renderResult(rec); t.classList.add('done'); phase = 'done'; }, REDUCED ? 100 : 3 * 520 + 500);
+    setTimeout(function () { renderResult(rec); t.classList.add('done'); phase = 'done'; track('draw-complete', '抽牌完成・看到結果'); }, REDUCED ? 100 : 3 * 520 + 500);
   });
 }
 $('btnSee').addEventListener('click', function () { BGM.duck(0.6); show('result'); $('result').querySelector('.res-in').scrollTop = 0; });
@@ -529,8 +546,18 @@ function renderCandle(rec) {
   });
 }
 $('btnDeep').addEventListener('click', function () {
-  if (CONFIG.DEEP_READING_URL) location.href = CONFIG.DEEP_READING_URL;
+  if (CONFIG.DEEP_READING_URL) {
+    track('click-reading', '預約專屬解讀');
+    var u = CONFIG.DEEP_READING_URL;
+    if (NO_COUNT) location.href = u; else setTimeout(function () { location.href = u; }, 150);   // let the hit go out first
+  }
   else toast('專屬解讀即將開放，敬請期待 ✦');
+});
+$('candle').addEventListener('click', function (e) {
+  var a = e.target && e.target.closest ? e.target.closest('.cd-btn') : null;
+  if (!a) return;
+  var n = $('candle').querySelector('.name');
+  track('click-candle', '私訊購買蠟燭：' + (n ? n.textContent.replace(/[「」]/g, '').replace(/蠟燭$/, '') : ''));
 });
 $('btnNext').addEventListener('click', function () { BGM.stop(1.5); renderHome(); });   // home stays silent
 
